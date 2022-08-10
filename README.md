@@ -20,6 +20,8 @@ It allow you to send money, see the status of a transaction and get the details 
 
 ## Getting started
 
+This package depends on the [uuid](https://pub.dev/packages/uuid) and the [http](https://pub.dev/packages/http) packages.
+
 TODO: List prerequisites and provide or point to information on how to
 start using the package.
 To install the package, 
