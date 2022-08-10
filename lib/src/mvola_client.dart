@@ -1,15 +1,14 @@
-import 'package:http/http.dart' as http;
-import 'package:mvola/src/constants.dart';
-
 import 'dart:convert';
 
+import 'package:http/http.dart' as http;
+import 'package:uuid/uuid.dart';
+
+import 'constants.dart';
 import 'transaction.dart';
 
-enum UserLanguage { fr, mg }
-
 class MVolaClient {
-  String _accessToken = '';
-  UserLanguage _userLanguage = UserLanguage.mg;
+  String? _accessToken;
+  String _userlanguage = 'FR';
   String consumerKey;
   String consumerSecret;
 
@@ -44,9 +43,10 @@ class MVolaClient {
       if (response.statusCode == 200) {
         final bodyMap = jsonDecode(response.body);
         _accessToken = bodyMap['access_token'];
-        return _accessToken;
+        return _accessToken!;
       }
-      return _accessToken;
+      // TODO : handles null return value
+      return _accessToken!;
     } catch (e) {
       // TODO : Exception handling
       print(e);
@@ -54,14 +54,92 @@ class MVolaClient {
     }
   }
 
-  @override
+  Future<Transaction> initTransaction(
+    String merchantName,
+    String merchantNumber,
+    int amount,
+    String customerNumber,
+  ) async {
+    if (_accessToken == null) {
+      throw Exception(
+          'No access token, you can generate one by calling the generateAccessToken method.');
+    }
+
+    final url =
+        Uri.parse('$sandboxUrl/mvola/mm/transactions/type/merchantpay/1.0.0/');
+
+    final headers = {
+      'Version': '1.0',
+      'X-CorrelationID': Uuid().v1(),
+      'UserLanguage': _userlanguage,
+      'UserAccountIdentifier': 'msisdn;$merchantNumber',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $_accessToken',
+      // 'partnerName': merchantName,
+      // 'X-Callback-URL': '',
+      'Cache-Control': 'no-cache',
+    };
+
+    final body = {
+      'amount': amount.toString(),
+      'currency': 'Ar',
+      'descriptionText': 'hahaa',
+      'requestingOrganisationTransactionReference': 'jlkjlksjdf',
+      'requestDate': _formatDate(DateTime.now()),
+      'debitParty': [
+        {
+          'key': 'msisdn',
+          'value': customerNumber,
+        }
+      ],
+      'creditParty': [
+        {
+          'key': 'msisdn',
+          'value': merchantNumber,
+        }
+      ],
+      'metadata': [
+        {
+          'key': 'partnerName',
+          'value': merchantName,
+        },
+        {
+          'key': 'fc',
+          'value': 'USD',
+        },
+        {
+          'key': 'amountFc',
+          'value': '1',
+        }
+      ],
+    };
+
+    try {
+      var response =
+          await http.post(url, headers: headers, body: json.encode(body));
+      if (response.statusCode == 200) {
+        return Transaction.fromJson(json.decode(response.body));
+      }
+      print(response.body);
+      print(response.statusCode);
+      throw Exception();
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
   Transaction getTransactionDetail() {
-    // TODO: implement getTransactionDetail
     throw UnimplementedError();
   }
 
-  @override
-  Transaction initTransaction() {
-    throw UnimplementedError();
+  void changeOptions() {}
+
+  String _formatDate(DateTime date) {
+    var date = DateTime.now().toString();
+    date = date.replaceRange(10, 11, 'T');
+    date = date.substring(0, date.length - 3);
+    date += 'Z';
+    return date;
   }
 }
