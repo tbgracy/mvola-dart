@@ -7,23 +7,19 @@ import 'transaction.dart';
 
 enum UserLanguage { fr, mg }
 
-abstract class MVolaClient {
-  void generateAccessToken();
-  Transaction getTransactionDetail();
-  Transaction initTransaction();
-}
-
-class MVolaClientImpl implements MVolaClient {
-  String? _accessToken;
+class MVolaClient {
+  String _accessToken = '';
   UserLanguage _userLanguage = UserLanguage.mg;
   String consumerKey;
   String consumerSecret;
 
-  MVolaClientImpl(this.consumerKey, this.consumerSecret);
+  String? get accessToken => _accessToken;
+
+  MVolaClient(this.consumerKey, this.consumerSecret);
 
   /// Generate an access token using the provided consumer key and consumer secret during instanciation
   @override
-  void generateAccessToken() async {
+  Future<String> generateAccessToken() async {
     final url = Uri.parse('$sandboxUrl/token');
 
     final base64Key = base64Encode(utf8.encode('$consumerKey:$consumerSecret'));
@@ -48,10 +44,13 @@ class MVolaClientImpl implements MVolaClient {
       if (response.statusCode == 200) {
         final bodyMap = jsonDecode(response.body);
         _accessToken = bodyMap['access_token'];
+        return _accessToken;
       }
-      // print(response.body);
+      return _accessToken;
     } catch (e) {
+      // TODO : Exception handling
       print(e);
+      rethrow;
     }
   }
 
@@ -65,10 +64,4 @@ class MVolaClientImpl implements MVolaClient {
   Transaction initTransaction() {
     throw UnimplementedError();
   }
-}
-
-void main(List<String> args) {
-  MVolaClient mvola = MVolaClientImpl(
-      '_Bq5IdbuDxI7v0ZUWeqdJmyrgdsa', 'xSQqSP1_2dwoqcFiRMDqbXLwoMka');
-  mvola.generateAccessToken();
 }
