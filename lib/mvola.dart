@@ -3,6 +3,6 @@
 /// More dartdocs go here.
 library mvola;
 
-export 'src/mvola_base.dart';
+export 'src/mvola_client.dart';
 
 // TODO: Export any libraries intended for clients of this package.
