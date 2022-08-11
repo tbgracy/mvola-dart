@@ -1,13 +1,13 @@
 enum TransactionStatus { completed, failed }
 
 class Transaction {
-  final TransactionStatus status;
+  final String status;
   final String serverCorrelationId;
   final String date;
   final int reference;
-  final List<String> debitParty;
-  final List<String> creditParty;
-  final double fees;
+  final List<Map<String, String>> debitParty;
+  final List<Map<String, String>> creditParty;
+  final List<Map<String, double>> fees;
 
   Transaction({
     required this.status,
@@ -25,9 +25,31 @@ class Transaction {
       serverCorrelationId: jsonMap['serverCorrelationId'],
       date: jsonMap['requestDate'],
       reference: jsonMap['transactionReference'],
-      debitParty: jsonMap['debitParty'],
-      creditParty: jsonMap['creditParty'],
+      debitParty: [
+        {
+          'key': 'msisdn',
+          'value': jsonMap['debitParty'][0]['value'],
+        }
+      ],
+      creditParty: [
+        {
+          'key': 'msisdn',
+          'value': jsonMap['creditParty'][0]['value'],
+        }
+      ],
       fees: jsonMap['fees']['feeAmount'],
     );
+  }
+
+  @override
+  String toString() {
+    return {
+      'status': status,
+      'serverCorrelationId': serverCorrelationId,
+      'date': date,
+      'reference': reference,
+      'debitParty': debitParty,
+      'creditParty': creditParty,
+    }.toString();
   }
 }
