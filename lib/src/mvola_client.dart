@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 
 import 'transaction.dart';
 import 'transaction_response.dart';
+import 'transaction_status_response.dart';
 import 'utils.dart';
 
 /// A dart client for the MVola API that allows us to make transactions and get the
@@ -169,7 +170,7 @@ class MVolaClient {
     }
   }
 
-  Future<String> getTransactionStatus(
+  Future<TransactionStatusResponse> getTransactionStatus(
     String serverCorrelationId,
     String merchantNumber,
     String partnerName,
@@ -191,7 +192,7 @@ class MVolaClient {
     try {
       var response = await http.get(url, headers: headers);
       print(response.body);
-      return jsonDecode(response.body)['status'];
+      return TransactionStatusResponse.fromJson(jsonDecode(response.body));
     } catch (e) {
       print(e);
       rethrow;

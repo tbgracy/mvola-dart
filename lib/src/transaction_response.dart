@@ -4,7 +4,10 @@ class TransactionResponse {
   String notificationMethod;
 
   TransactionResponse(
-      this.status, this.serverCorrelationId, this.notificationMethod);
+    this.status,
+    this.serverCorrelationId,
+    this.notificationMethod,
+  );
 
   factory TransactionResponse.fromJson(Map<String, dynamic> jsonMap) {
     return TransactionResponse(

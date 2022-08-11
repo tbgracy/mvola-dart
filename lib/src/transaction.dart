@@ -1,12 +1,10 @@
-import 'dart:convert';
-
 class Transaction {
   final String amount;
   final String currency;
   final String requestDate;
-  List? debitParty;
-  List? creditParty;
-  List? fees;
+  List debitParty;
+  List creditParty;
+  List fees;
   final String status;
   final String creationDate;
   final String transactionReference;
@@ -15,6 +13,9 @@ class Transaction {
     this.amount,
     this.currency,
     this.requestDate,
+    this.debitParty,
+    this.creditParty,
+    this.fees,
     this.status,
     this.creationDate,
     this.transactionReference,
@@ -25,6 +26,9 @@ class Transaction {
       jsonMap['amount'],
       jsonMap['currency'],
       jsonMap['requestDate'],
+      jsonMap['debitParty'],
+      jsonMap['creditParty'],
+      jsonMap['fees'],
       jsonMap['transactionStatus'],
       jsonMap['creationDate'],
       jsonMap['transactionReference'],
@@ -36,9 +40,10 @@ class Transaction {
     return {
       'status': status,
       'date': creationDate,
-      // 'reference': reference,
-      'debitParty': debitParty,
-      'creditParty': creditParty,
+      'amount': '$amount $currency',
+      'fee': fees,
+      'merchant number': debitParty[0]['value'],
+      'client number': creditParty[0]['value'],
     }.toString();
   }
 }
