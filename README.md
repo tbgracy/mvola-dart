@@ -12,7 +12,7 @@ This package depends on the [uuid](https://pub.dev/packages/uuid) and the [http]
 ### Terminal installation
 Type in the terminal : 
 ```sh
-dart pub get mvola
+dart pub add mvola
 ```
 
 ### Pubspec installation
