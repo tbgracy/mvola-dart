@@ -1,13 +1,14 @@
 # MVolaAPI dart package
-This is a package that can be used to interact with the [MVola API](https://www.mvola.mg/devportal/home).
+This is a package that can be used to interact with the [not that] brand new [MVola API](https://www.mvola.mg/devportal/home).
 
-## Features
+## 🔫 Features
 
 It allow you to make payments, see the status of a transaction and get the details of a previously made transaction.
 
-## Getting started
+## 🛠️ Getting started
 
 This package depends on the [uuid](https://pub.dev/packages/uuid) and the [http](https://pub.dev/packages/http) packages.
+
 
 ### Terminal installation
 Type in the terminal : 
@@ -21,6 +22,7 @@ Add these lines to your pubspec.yaml :
 dependencies:
     mvola:
 ```
+More info can be found [here](https://pub.dev/packages/mvola), the official package repository for [Dart](https://dart.dev/) and [Flutter](https://flutter.dev/).
 
 ## Usage
 Start by importing the library.
@@ -56,11 +58,11 @@ print(transactionStatus);
 var transaction = await mvola.getTransactionDetail("636838929", "gvola", "0343500004");
 print(transaction); 
 ```
-The complete example code can be found [here](https://github.com/tbgracy/mvola-dart/blob/main/example/mvola_example.dart).
+The complete example code can be found [here](https://github.com/tbgracy/mvola-dart/blob/main/example/mvola_example.dart) or [here](https://pub.dev/packages/mvola/example).
 
 ## Additional information
 
-This package is still in early stage of developpment. So please, if don't hesitate to point out any issue or suggest an improvment.
+ℹ️ This package is still in early stage of developpment. So please, don't hesitate to point out any issue or suggest an improvment.
 
 ## Author
-**Tsierenana Botramanagna Gracy**
+👤 **Tsierenana Botramanagna Gracy**
