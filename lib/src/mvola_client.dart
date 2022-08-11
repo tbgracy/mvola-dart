@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 
 import 'constants.dart';
 import 'transaction.dart';
+import 'utils.dart';
 
 class MVolaClient {
   String? _accessToken;
@@ -85,7 +86,7 @@ class MVolaClient {
       'currency': 'Ar',
       'descriptionText': 'hahaa',
       'requestingOrganisationTransactionReference': 'jlkjlksjdf',
-      'requestDate': _formatDate(DateTime.now()),
+      'requestDate': formatDate(DateTime.now()),
       'debitParty': [
         {
           'key': 'msisdn',
@@ -133,13 +134,9 @@ class MVolaClient {
     throw UnimplementedError();
   }
 
-  void changeOptions() {}
-
-  String _formatDate(DateTime date) {
-    var date = DateTime.now().toString();
-    date = date.replaceRange(10, 11, 'T');
-    date = date.substring(0, date.length - 3);
-    date += 'Z';
-    return date;
+  String getTransactionStatus() {
+    throw UnimplementedError();
   }
+
+  void changeOptions() {}
 }
