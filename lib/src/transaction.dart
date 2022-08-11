@@ -1,43 +1,33 @@
-enum TransactionStatus { completed, failed }
+import 'dart:convert';
 
 class Transaction {
+  final String amount;
+  final String currency;
+  final String requestDate;
+  List? debitParty;
+  List? creditParty;
+  List? fees;
   final String status;
-  final String serverCorrelationId;
-  final String date;
-  final int reference;
-  final List<Map<String, String>> debitParty;
-  final List<Map<String, String>> creditParty;
-  final List<Map<String, double>> fees;
+  final String creationDate;
+  final String transactionReference;
 
-  Transaction({
-    required this.status,
-    required this.serverCorrelationId,
-    required this.date,
-    required this.reference,
-    required this.debitParty,
-    required this.creditParty,
-    required this.fees,
-  });
+  Transaction(
+    this.amount,
+    this.currency,
+    this.requestDate,
+    this.status,
+    this.creationDate,
+    this.transactionReference,
+  );
 
   factory Transaction.fromJson(Map<String, dynamic> jsonMap) {
     return Transaction(
-      status: jsonMap['transactionStatus'],
-      serverCorrelationId: jsonMap['serverCorrelationId'],
-      date: jsonMap['requestDate'],
-      reference: jsonMap['transactionReference'],
-      debitParty: [
-        {
-          'key': 'msisdn',
-          'value': jsonMap['debitParty'][0]['value'],
-        }
-      ],
-      creditParty: [
-        {
-          'key': 'msisdn',
-          'value': jsonMap['creditParty'][0]['value'],
-        }
-      ],
-      fees: jsonMap['fees']['feeAmount'],
+      jsonMap['amount'],
+      jsonMap['currency'],
+      jsonMap['requestDate'],
+      jsonMap['transactionStatus'],
+      jsonMap['creationDate'],
+      jsonMap['transactionReference'],
     );
   }
 
@@ -45,9 +35,8 @@ class Transaction {
   String toString() {
     return {
       'status': status,
-      'serverCorrelationId': serverCorrelationId,
-      'date': date,
-      'reference': reference,
+      'date': creationDate,
+      // 'reference': reference,
       'debitParty': debitParty,
       'creditParty': creditParty,
     }.toString();
