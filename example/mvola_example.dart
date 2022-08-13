@@ -11,19 +11,18 @@ void main() async {
     env['CONSUMER_SECRET']!,
   );
 
-  await mvola.generateAccessToken();
+  var token = await mvola.generateAccessToken();
+  print(token);
 
   var transactionResponse = await mvola.initTransaction(
-    'gvola',
+    'name',
     '0343500004',
     5000,
     '0343500003',
+    'short description',
   );
   print(transactionResponse);
 
-  var transactionStatus = await mvola.getTransactionStatus(transactionResponse.serverCorrelationId, '0343500004', 'gvola');
+  var transactionStatus = await mvola.getTransactionStatus(transactionResponse.serverCorrelationId, '0343500003', 'name');
   print(transactionStatus);
-
-  var transaction = await mvola.getTransactionDetail("636838929", "gvola", "0343500004");
-  print(transaction);  
 }

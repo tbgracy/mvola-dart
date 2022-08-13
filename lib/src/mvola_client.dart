@@ -16,19 +16,28 @@ class MVolaClient {
   final String _consumerKey;
   final String _consumerSecret;
   String _version = '1.0';
-  final String _baseUrl;
+  String _baseUrl;
+  String? _callbackUrl;
 
   String? get accessToken => _accessToken;
 
-  MVolaClient(String baseUrl, String consumerKey, String consumerSecret)
+  /// Create a MVolaClient object
+  ///
+  /// Takes [baseUrl], [consumerKey] and [consumerSecret] as mandatory parameters
+  ///
+  /// You can optionnally provide [callbackUrl], an URL where the MVola APi will send
+  /// the result of a transaction whethere it failed or it succeded.
+  MVolaClient(String baseUrl, String consumerKey, String consumerSecret,
+      [String? callbackUrl])
       : _baseUrl = baseUrl,
         _consumerKey = consumerKey,
-        _consumerSecret = consumerSecret;
+        _consumerSecret = consumerSecret,
+        _callbackUrl = callbackUrl;
 
   /// Generate an access token using the [consumerKey] and [consumerSecret] provided
   /// at object instanciation.
   ///
-  /// Return the token as a string
+  /// Return the [accessToken] as a string if successful, otherwise raise an Exception.
   Future<String> generateAccessToken() async {
     final url = Uri.parse('$_baseUrl/token');
 
@@ -57,23 +66,24 @@ class MVolaClient {
         _accessToken = bodyMap['access_token'];
         return _accessToken!;
       }
-      // TODO : handles null return value
-      return _accessToken!;
+      throw Exception('Couldn\'t get an access token');
     } catch (e) {
-      // TODO : Exception handling
-      print(e);
-      rethrow;
+      throw Exception('There was an error : $e');
     }
   }
 
+  /// Initiate a transaction.
+  ///
+  /// Send [amount] amount of money to [merchantNumber] from [customerNumber].
+  /// A short [description] and [merchantName] (the phone number ) must be provided.
+  /// Return a [TransactionResponse] if succeed, otherwise throw an Exception
   Future<TransactionResponse> initTransaction(
     String merchantName,
     String merchantNumber,
     int amount,
-    String customerNumber, [
-    String description = 'description',
-    String callbackUrl = '',
-  ]) async {
+    String customerNumber,
+    String description,
+  ) async {
     if (_accessToken == null) {
       throw Exception(
           'No access token, you can generate one by calling the generateAccessToken method.');
@@ -89,10 +99,13 @@ class MVolaClient {
       'UserAccountIdentifier': 'msisdn;$merchantNumber',
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $_accessToken',
-      // 'partnerName': merchantName,
-      // 'X-Callback-URL': '',
+      'partnerName': merchantName,
       'Cache-Control': 'no-cache',
     };
+
+    if (_callbackUrl != null) {
+      headers['X-Callback-URL'] = _callbackUrl!;
+    }
 
     final body = {
       'amount': amount.toString(),
@@ -134,15 +147,17 @@ class MVolaClient {
       if (response.statusCode == 202) {
         return TransactionResponse.fromJson(json.decode(response.body));
       }
-      print(response.body);
-      print(response.statusCode);
-      throw Exception();
+      throw Exception(response.body);
     } catch (e) {
       print(e);
       rethrow;
     }
   }
 
+  /// Get the details of a transaction based on [transactionId], return as [objectReference] from
+  /// calling [getTransactionDetail] method
+  ///
+  /// Return a [Transaction] object
   Future<Transaction> getTransactionDetail(
     String transactionId,
     String partnerName,
@@ -170,6 +185,8 @@ class MVolaClient {
     }
   }
 
+  /// Get the status of a transaction based on the [serverCorrelationId]
+  /// returned in the response a [initTransaction] call
   Future<TransactionStatusResponse> getTransactionStatus(
     String serverCorrelationId,
     String merchantNumber,
@@ -181,7 +198,7 @@ class MVolaClient {
     var headers = {
       'Authorization': 'Bearer $_accessToken',
       'Version': _version,
-      'X-CorrelationID': Uuid().v4(),
+      'X-CorrelationID': Uuid().v1(),
       'UserLanguage': _userlanguage,
       'UserAccountIdentifier': 'msisdn;$merchantNumber',
       'partnerName': partnerName,
@@ -191,7 +208,6 @@ class MVolaClient {
 
     try {
       var response = await http.get(url, headers: headers);
-      print(response.body);
       return TransactionStatusResponse.fromJson(jsonDecode(response.body));
     } catch (e) {
       print(e);
@@ -199,13 +215,19 @@ class MVolaClient {
     }
   }
 
+  /// Set some variables of the MVolaClient object
+  /// Takes any of [version], [userLanguage], [callbackUrl], [partnerName] or [baseUrl]
+  /// as optional named parameters
   void setOptions({
     String? version,
     String? userLanguage,
     String? callbackUrl,
     String? partnerName,
+    String? baseUrl,
   }) {
     _version = version ?? _version;
     _userlanguage = userLanguage ?? _userlanguage;
+    _callbackUrl = callbackUrl ?? _callbackUrl;
+    _baseUrl = baseUrl ?? _baseUrl;
   }
 }

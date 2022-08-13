@@ -32,8 +32,10 @@ import 'package:mvola/mvola.dart';
 ```
 Then create an instance of the `MVolaClient` class.
 ```dart
-var mvola = MVolaClient();
+var mvola = MVolaClient(baseUrl, consumerKey, consumerSecret);
 ```
+[consumerKey] and [consumerSecret] can be found on the [mvola devportal](https://www.mvola.mg/devportal) upon creating an application.
+
 You then have to generate an access token in order to make transactions.
 You can store it in a variable for later use or just call the method to set it.
 ```dart
@@ -43,21 +45,24 @@ Now, you can make transactions, get the status of that transaction or get the de
 ```dart
 // make a transaction
 var transactionResponse = await mvola.initTransaction(
-    'gvola',
+    'name',
     '0343500004',
     5000,
     '0343500003',
+    'short description',
 );
 print(transactionResponse);
 
 // get the status of a transaction
-var transactionStatus = await mvola.getTransactionStatus(transactionResponse.serverCorrelationId, '0343500004', 'gvola');
+var transactionStatus = await mvola.getTransactionStatus(transactionResponse.serverCorrelationId, '0343500004', 'name');
 print(transactionStatus);
 
 // get the detail of a transaction
-var transaction = await mvola.getTransactionDetail("636838929", "gvola", "0343500004");
+var transaction = await mvola.getTransactionDetail(serverCorrelationId, "name", "0343500004");
 print(transaction); 
 ```
+In the development environment, only 0343500004 and 0343500003 can be used as merchant or customer numbers.
+
 The complete example code can be found [here](https://github.com/tbgracy/mvola-dart/blob/main/example/mvola_example.dart) or [here](https://pub.dev/packages/mvola/example).
 
 ## Additional information
