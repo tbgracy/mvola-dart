@@ -74,14 +74,16 @@ class MVolaClient {
 
   /// Initiate a transaction.
   ///
-  /// Send [amount] amount of money to [merchantNumber] from [customerNumber].
-  /// A short [description] and [merchantName] (the phone number ) must be provided.
+  /// Send [amount] amount of money to [creditNumber] from [debitNumber].
+  /// A short [description] and [partnerName] (the phone number ) must be provided.
+  /// 
   /// Return a [TransactionResponse] if succeed, otherwise throw an Exception
   Future<TransactionResponse> initTransaction(
-    String merchantName,
-    String merchantNumber,
+    String partnerName,
+    String partnerNumber,
+    String creditNumber,
     int amount,
-    String customerNumber,
+    String debitNumber,
     String description,
   ) async {
     if (_accessToken == null) {
@@ -96,10 +98,10 @@ class MVolaClient {
       'Version': _version,
       'X-CorrelationID': Uuid().v1(),
       'UserLanguage': _userlanguage,
-      'UserAccountIdentifier': 'msisdn;$merchantNumber',
+      'UserAccountIdentifier': 'msisdn;$creditNumber',
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $_accessToken',
-      'partnerName': merchantName,
+      'partnerName': partnerName,
       'Cache-Control': 'no-cache',
     };
 
@@ -116,19 +118,19 @@ class MVolaClient {
       'debitParty': [
         {
           'key': 'msisdn',
-          'value': customerNumber,
+          'value': debitNumber,
         }
       ],
       'creditParty': [
         {
           'key': 'msisdn',
-          'value': merchantNumber,
+          'value': creditNumber,
         }
       ],
       'metadata': [
         {
           'key': 'partnerName',
-          'value': merchantName,
+          'value': partnerName,
         },
         {
           'key': 'fc',
@@ -178,7 +180,7 @@ class MVolaClient {
 
     try {
       var response = await http.get(url, headers: headers);
-      return Transaction.fromJson(jsonDecode(response.body));
+      return Transaction.fromJson(json.decode(response.body));
     } catch (e) {
       print(e);
       rethrow;
@@ -186,6 +188,7 @@ class MVolaClient {
   }
 
   /// Get the status of a transaction based on the [serverCorrelationId]
+  /// 
   /// returned in the response a [initTransaction] call
   Future<TransactionStatusResponse> getTransactionStatus(
     String serverCorrelationId,
@@ -215,14 +218,14 @@ class MVolaClient {
     }
   }
 
-  /// Set some variables of the MVolaClient object
+  /// Change/set some variables of the MVolaClient object
+  /// 
   /// Takes any of [version], [userLanguage], [callbackUrl], [partnerName] or [baseUrl]
   /// as optional named parameters
   void setOptions({
     String? version,
     String? userLanguage,
     String? callbackUrl,
-    String? partnerName,
     String? baseUrl,
   }) {
     _version = version ?? _version;
