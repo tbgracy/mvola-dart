@@ -17,12 +17,28 @@ void main() async {
   var transactionResponse = await mvola.initTransaction(
     'name',
     '0343500004',
+    '0343500004',
     5000,
     '0343500003',
     'short description',
   );
   print(transactionResponse);
 
-  var transactionStatus = await mvola.getTransactionStatus(transactionResponse.serverCorrelationId, '0343500003', 'name');
+  // We have to wait for the transaction to be approved to be able 
+  // to get the ID to get the details
+  await Future.delayed(Duration(seconds: 30));
+
+  var transactionStatus = await mvola.getTransactionStatus(
+    transactionResponse.serverCorrelationId,
+    '0343500003',
+    'name',
+  );
   print(transactionStatus);
+
+  var transactionDetails = await mvola.getTransactionDetail(
+    transactionStatus.transactionReference,
+    'name',
+    '0343500004',
+  );
+  print(transactionDetails);
 }
