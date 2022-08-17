@@ -1,9 +1,8 @@
 name: mvola
 description: A MVola API client for dart and eventually flutter.
 repository: https://github.com/tbgracy/mvola-dart
-homepage: https://pub.dev/packages/mvola
 
-version: 0.1.0-dev.3
+version: 1.0.0
 
 environment:
   sdk: '>=2.17.6 <3.0.0'

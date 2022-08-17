@@ -86,6 +86,7 @@ The complete example code can be found [here](https://github.com/tbgracy/mvola-d
 
 * [ ] Improve documentation
 * [ ] Improve error/exception responses
+* [ ] Add badges to [README.md](https://github.com/tbgracy/mvola-dart/blob/main/README.md)
 
 ## Support
 

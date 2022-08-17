@@ -1,3 +1,9 @@
+# 1.0.0
+
+- Use named parameter to initiate a transaction
+- Add comments
+- Improve error handling
+
 # 0.1.0-dev.3
 
 - Add documentation
