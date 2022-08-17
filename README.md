@@ -33,7 +33,7 @@ dependencies:
     mvola:
 ```
 
-More info can be found [here](https://pub.dev/packages/mvola), the official package repository for [Dart](https://dart.dev/) and [Flutter](https://flutter.dev/).
+More info can be found on [pub.dev](https://pub.dev/packages/mvola), the official package repository for [Dart](https://dart.dev/) and [Flutter](https://flutter.dev/).
 
 ## Usage
 

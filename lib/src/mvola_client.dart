@@ -8,6 +8,8 @@ import 'transaction_response.dart';
 import 'transaction_status_response.dart';
 import 'utils.dart';
 
+//TODO: Improve parameters
+
 /// A dart client for the MVola API that allows us to make transactions and get the
 /// details or status of a transaction based on its [correlationID].
 class MVolaClient {
@@ -28,7 +30,7 @@ class MVolaClient {
   /// You can optionnally provide [callbackUrl], an URL where the MVola APi will send
   /// the result of a transaction whethere it failed or it succeded.
   MVolaClient(String baseUrl, String consumerKey, String consumerSecret,
-      [String? callbackUrl])
+      {String? callbackUrl})
       : _baseUrl = baseUrl,
         _consumerKey = consumerKey,
         _consumerSecret = consumerSecret,
@@ -37,7 +39,7 @@ class MVolaClient {
   /// Generate an access token using the [consumerKey] and [consumerSecret] provided
   /// at object instanciation.
   ///
-  /// Return the [accessToken] as a string if successful, otherwise raise an Exception.
+  /// Return the [accessToken] as a string if successful, otherwise throw an Exception.
   Future<String> generateAccessToken() async {
     final url = Uri.parse('$_baseUrl/token');
 
@@ -65,10 +67,15 @@ class MVolaClient {
         final bodyMap = jsonDecode(response.body);
         _accessToken = bodyMap['access_token'];
         return _accessToken!;
+      } else {
+        throw Exception({
+          'Exception': "Couldn't get access token.",
+          'Status code': response.statusCode,
+          'Response body': json.decode(response.body) as Map<String, dynamic>,
+        });
       }
-      throw Exception('Couldn\'t get an access token');
     } catch (e) {
-      throw Exception('There was an error : $e');
+      rethrow;
     }
   }
 
@@ -76,16 +83,16 @@ class MVolaClient {
   ///
   /// Send [amount] amount of money to [creditNumber] from [debitNumber].
   /// A short [description] and [partnerName] (the phone number ) must be provided.
-  /// 
+  ///
   /// Return a [TransactionResponse] if succeed, otherwise throw an Exception
-  Future<TransactionResponse> initTransaction(
-    String partnerName,
-    String partnerNumber,
-    String creditNumber,
-    int amount,
-    String debitNumber,
-    String description,
-  ) async {
+  Future<TransactionResponse> initTransaction({
+    required String partnerName,
+    required String partnerNumber,
+    required String creditNumber,
+    required int amount,
+    required String debitNumber,
+    required String description,
+  }) async {
     if (_accessToken == null) {
       throw Exception(
           'No access token, you can generate one by calling the generateAccessToken method.');
@@ -148,10 +155,55 @@ class MVolaClient {
           await http.post(url, headers: headers, body: json.encode(body));
       if (response.statusCode == 202) {
         return TransactionResponse.fromJson(json.decode(response.body));
+      } else {
+        throw Exception({
+          'Exception': "Couldn't perform transaction.",
+          'Status code': response.statusCode,
+          'Response body': json.decode(response.body) as Map<String, dynamic>,
+        });
       }
-      throw Exception(response.body);
     } catch (e) {
-      print(e);
+      rethrow;
+    }
+  }
+
+  /// Get the status of a transaction based on the [serverCorrelationId]
+  ///
+  /// If the transaction has not been approved, the [objectReference] whill
+  /// be empty and can't be used to get the details of that transaction.
+  ///
+  /// returned in the response a [initTransaction] call
+  Future<TransactionStatusResponse> getTransactionStatus(
+    String serverCorrelationId,
+    String merchantNumber,
+    String partnerName,
+  ) async {
+    var url = Uri.parse(
+        '$_baseUrl/mvola/mm/transactions/type/merchantpay/1.0.0/status/$serverCorrelationId');
+
+    var headers = {
+      'Authorization': 'Bearer $_accessToken',
+      'Version': _version,
+      'X-CorrelationID': Uuid().v1(),
+      'UserLanguage': _userlanguage,
+      'UserAccountIdentifier': 'msisdn;$merchantNumber',
+      'partnerName': partnerName,
+      'Content-Type': 'application/json',
+      'Cache-control': 'no-cache',
+    };
+
+    try {
+      var response = await http.get(url, headers: headers);
+      if (response.statusCode == 200) {
+        return TransactionStatusResponse.fromJson(jsonDecode(response.body));
+      } else {
+        throw Exception({
+          'Exception': "Couldn't get transaction status",
+          'Status Code': response.statusCode,
+          'Response body': response.body,
+        });
+      }
+    } catch (e) {
       rethrow;
     }
   }
@@ -180,46 +232,22 @@ class MVolaClient {
 
     try {
       var response = await http.get(url, headers: headers);
-      return Transaction.fromJson(json.decode(response.body));
+      if (response.statusCode == 200) {
+        return Transaction.fromJson(json.decode(response.body));
+      } else {
+        throw Exception({
+          'Exception': "Couldn't get transaction details",
+          'Status code': response.statusCode,
+          'Response body': response.body,
+        });
+      }
     } catch (e) {
-      print(e);
-      rethrow;
-    }
-  }
-
-  /// Get the status of a transaction based on the [serverCorrelationId]
-  /// 
-  /// returned in the response a [initTransaction] call
-  Future<TransactionStatusResponse> getTransactionStatus(
-    String serverCorrelationId,
-    String merchantNumber,
-    String partnerName,
-  ) async {
-    var url = Uri.parse(
-        '$_baseUrl/mvola/mm/transactions/type/merchantpay/1.0.0/status/$serverCorrelationId');
-
-    var headers = {
-      'Authorization': 'Bearer $_accessToken',
-      'Version': _version,
-      'X-CorrelationID': Uuid().v1(),
-      'UserLanguage': _userlanguage,
-      'UserAccountIdentifier': 'msisdn;$merchantNumber',
-      'partnerName': partnerName,
-      'Content-Type': 'application/json',
-      'Cache-control': 'no-cache',
-    };
-
-    try {
-      var response = await http.get(url, headers: headers);
-      return TransactionStatusResponse.fromJson(jsonDecode(response.body));
-    } catch (e) {
-      print(e);
       rethrow;
     }
   }
 
   /// Change/set some variables of the MVolaClient object
-  /// 
+  ///
   /// Takes any of [version], [userLanguage], [callbackUrl], [partnerName] or [baseUrl]
   /// as optional named parameters
   void setOptions({
@@ -228,6 +256,7 @@ class MVolaClient {
     String? callbackUrl,
     String? baseUrl,
   }) {
+    // TODO : Check entered values
     _version = version ?? _version;
     _userlanguage = userLanguage ?? _userlanguage;
     _callbackUrl = callbackUrl ?? _callbackUrl;

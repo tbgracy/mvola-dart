@@ -15,13 +15,14 @@ void main() async {
   print(token);
 
   var transactionResponse = await mvola.initTransaction(
-    'name',
-    '0343500004',
-    '0343500004',
-    5000,
-    '0343500003',
-    'short description',
+    partnerName: 'name',
+    partnerNumber: '0343500004',
+    creditNumber: '0343500004',
+    amount: 5000,
+    debitNumber: '0343500003',
+    description: 'short description',
   );
+
   print(transactionResponse);
 
   // We have to wait for the transaction to be approved to be able 
