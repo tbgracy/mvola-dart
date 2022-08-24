@@ -87,10 +87,12 @@ The complete example code can be found [here](https://github.com/tbgracy/mvola-d
 * [ ] Improve documentation
 * [ ] Improve error/exception responses
 * [ ] Add badges to [README.md](https://github.com/tbgracy/mvola-dart/blob/main/README.md)
+* [ ] Add disclaimer to not use this package with client-side code (use with server-side stuff
+like serverpod)
 
 ## Support
 
-If you encounter any issue or want more information about this package, don't hesitate to <a href='mailto:gtsierenana@gmail.com'>email me</a> or message me on <a href="https://facebook.com/gracy.botramanagna">facebook</a> or open an issue.
+If you encounter any issue or want more information about this package, don't hesitate to [email me](mailto:gtsierenana@gmail.com) or message me on [facebook](https://facebook.com/gracy.botramanagna) or open an issue.
 
 ## Additional information
 
@@ -104,4 +106,4 @@ If you encounter any issue or want more information about this package, don't he
 
 👤 **Tsierenana Botramanagna Gracy**
 
-✉️ <a href='mailto:gtsierenana@gmail.com'>gtsierenana@gmail.com</a>
+✉️ [gtsierenana@gmail.com](mailto:gtsierenana@gmail.com)
