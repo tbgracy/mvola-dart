@@ -2,6 +2,10 @@
 
 This is a package that can be used to interact with the [not that] brand new [MVola API](https://www.mvola.mg/devportal/home) from a [Dart](https://dart.dev) or [Flutter](https://flutter.dev) client.
 
+## ⚠️ DISCLAIMER
+
+It is not recommended to manage payments in the client side due to some security reasons (most of dart packages are used for Flutter), so use it at your own risk. It was only after the first release of the package that I acknowledged that fact but I am not gonna delete it.
+
 ## 🔫 Features
 
 It allow you to make payments, see the status of a transaction and get the details of a previously made transaction.
